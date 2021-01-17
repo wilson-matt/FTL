@@ -2,7 +2,7 @@
 #using data from USGS gauges.
 #Data available at: https://maps.waterdata.usgs.gov/mapper/index.html
 
-#Dependencies
+#Dependencies----
 #library(googleVis)
 #library(devtools)
 # Hit an empty line in the Console to skip updates
@@ -12,7 +12,7 @@ library(ggplot2)
 library(chron)
 library(zoo)
 
-#%%Flow figures%%%---------
+#Flow figures%%%---------
 #Have to be careful and check time periods downloaded to ensure there 
 #are actually solid data available for entire date range
 flow <- "00060"
@@ -138,13 +138,22 @@ for(i in seq_along(gage.list))
 {  site <- gage.list[i]
 
 #Rest of script - sub "site" for the gauge code in the functions#
+#1993-95
 flow_pre1 <- readNWISuv(site,flow,"1993-01-01","1993-12-31")
+flow_pre1$year <- format(flow_pre1$dateTime, "%Y")
+flow_pre1 <- subset(flow_pre1, year != "1994")
 flow_pre1$jdate <- yday(as.Date(flow_pre1$dateTime))
 pre1_day <- aggregate(X_00060_00000 ~ jdate, data = flow_pre1, mean)
+
 flow_pre2 <- readNWISuv(site,flow,"1994-01-01","1994-12-31")
+flow_pre2$year <- format(flow_pre2$dateTime, "%Y")
+flow_pre2 <- subset(flow_pre2, year != "1995")
 flow_pre2$jdate <- yday(as.Date(flow_pre2$dateTime))
 pre2_day <- aggregate(X_00060_00000 ~ jdate, data = flow_pre2, mean)
+
 flow_pre3 <- readNWISuv(site,flow,"1995-01-01","1995-12-31")
+flow_pre3$year <- format(flow_pre3$dateTime, "%Y")
+flow_pre3 <- subset(flow_pre3, year != "1996")
 flow_pre3$jdate <- yday(as.Date(flow_pre3$dateTime))
 pre3_day <- aggregate(X_00060_00000 ~ jdate, data = flow_pre3, mean)
 
@@ -152,14 +161,23 @@ df_list <- list(pre1_day, pre2_day, pre3_day)
 pre_all <- Reduce(function(x, y) merge(x, y, by= "jdate"), df_list, accumulate=FALSE)
 
 pre_flow_site <- cbind(pre_all, meanflow = rowMeans(pre_all[2:4]))
-#flow, post site
+
+#flow, post site (2017-19)
 flow_post1 <- readNWISuv(site,flow,"2017-01-01","2017-12-31")
+flow_post1$year <- format(flow_post1$dateTime, "%Y")
+flow_post1 <- subset(flow_post1, year != "2018")
 flow_post1$jdate <- yday(as.Date(flow_post1$dateTime))
 post1_day <- aggregate(X_00060_00000 ~ jdate, data = flow_post1, mean)
+
 flow_post2 <- readNWISuv(site,flow,"2018-01-01","2018-12-31")
+flow_post2$year <- format(flow_post2$dateTime, "%Y")
+flow_post2 <- subset(flow_post2, year != "2019")
 flow_post2$jdate <- yday(as.Date(flow_post2$dateTime))
 post2_day <- aggregate(X_00060_00000 ~ jdate, data = flow_post2, mean)
+
 flow_post3 <- readNWISuv(site,flow,"2019-01-01","2019-12-31")
+flow_post3$year <- format(flow_post3$dateTime, "%Y")
+flow_post3 <- subset(flow_post3, year != "2020")
 flow_post3$jdate <- yday(as.Date(flow_post3$dateTime))
 post3_day <- aggregate(X_00060_00000 ~ jdate, data = flow_post3, mean)
 
@@ -168,10 +186,10 @@ post_all <- Reduce(function(x, y) merge(x, y, by= "jdate"), df_list, accumulate=
 
 post_flow_site <- cbind(post_all, meanflow = rowMeans(post_all[2:4]))
 
-head(pre_flow_site)
-pre_date <- as.data.frame(month.day.year(pre_flow_site$jdate))
-pre_flow_site$monthday <- as.Date(with(pre_date, paste(month, day,sep="-")), "%m-%d")
-pre_flow_site$monthday <- as.Date(pre_flow_site$monthday)
+#head(pre_flow_site)
+#pre_date <- as.data.frame(month.day.year(pre_flow_site$jdate))
+#pre_flow_site$monthday <- as.Date(with(pre_date, paste(month, day,sep="-")), "%m-%d")
+#pre_flow_site$monthday <- as.Date(pre_flow_site$monthday)
 
 #then just output all of the plots
 jpeg(filename=paste("Figures/", "flow.avg", gage.names[i], ".jpg"), 
@@ -191,7 +209,7 @@ print(ggplot(pre_flow_site, aes(jdate, meanflow))+
             aes(y=rollmean(meanflow, 20, na.pad=TRUE), color="2017-19"),
             size=1.5,na.rm = TRUE) +
     theme_bw() +
-    scale_color_manual(values=c("#000000", "#999999"))+
+    scale_color_manual(values=c("#999999", "#000000"))+
   theme(axis.line = element_line(color = "black"),
         axis.text = element_text(size = 13),
         axis.title.x = element_text(size = 13, face = "bold"),
@@ -200,7 +218,7 @@ print(ggplot(pre_flow_site, aes(jdate, meanflow))+
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
         panel.background = element_blank())+
-    ylab(expression(Discharge~(ft^3/s)))+
+    ylab(expression(bold(Discharge~(ft^3/s))))+
     xlab("Julian Date")+
   theme(legend.title=element_blank(),
         legend.text=element_text(size=13))+
@@ -252,28 +270,46 @@ for(i in seq_along(gage.list))
 {  site <- gage.list[i]
 
 #Rest of script - sub "site" for the gauge code in the functions#
+#2008-10
 temp_pre1 <- readNWISuv(site,temp,"2008-01-01","2008-12-31")
+temp_pre1$year <- format(temp_pre1$dateTime, "%Y")
+temp_pre1 <- subset(temp_pre1, year != "2009")
 temp_pre1$jdate <- yday(as.Date(temp_pre1$dateTime))
 pre1_day <- aggregate(X_00010_00000 ~ jdate, data = temp_pre1, mean)
+
 temp_pre2 <- readNWISuv(site,temp,"2009-01-01","2009-12-31")
+temp_pre2$year <- format(temp_pre2$dateTime, "%Y")
+temp_pre2 <- subset(temp_pre2, year != "2010")
 temp_pre2$jdate <- yday(as.Date(temp_pre2$dateTime))
 pre2_day <- aggregate(X_00010_00000 ~ jdate, data = temp_pre2, mean)
+
 temp_pre3 <- readNWISuv(site,temp,"2010-01-01","2010-12-31")
 temp_pre3$jdate <- yday(as.Date(temp_pre3$dateTime))
+temp_pre3$year <- format(temp_pre3$dateTime, "%Y")
+temp_pre3 <- subset(temp_pre3, year != "2011")
 pre3_day <- aggregate(X_00010_00000 ~ jdate, data = temp_pre3, mean)
 
 df_list <- list(pre1_day, pre2_day, pre3_day)
 pre_all <- Reduce(function(x, y) merge(x, y, by= "jdate"), df_list, accumulate=FALSE)
 
 pre_temp_site <- cbind(pre_all, meantemp = rowMeans(pre_all[2:4]))
-#temp, post site
+
+#temp, post site: 2017-19
 temp_post1 <- readNWISuv(site,temp,"2017-01-01","2017-12-31")
+temp_post1$year <- format(temp_post1$dateTime, "%Y")
+temp_post1 <- subset(temp_post1, year != "2018")
 temp_post1$jdate <- yday(as.Date(temp_post1$dateTime))
 post1_day <- aggregate(X_00010_00000 ~ jdate, data = temp_post1, mean)
+
 temp_post2 <- readNWISuv(site,temp,"2018-01-01","2018-12-31")
+temp_post2$year <- format(temp_post2$dateTime, "%Y")
+temp_post2 <- subset(temp_post2, year != "2019")
 temp_post2$jdate <- yday(as.Date(temp_post2$dateTime))
 post2_day <- aggregate(X_00010_00000 ~ jdate, data = temp_post2, mean)
+
 temp_post3 <- readNWISuv(site,temp,"2019-01-01","2019-12-31")
+temp_post3$year <- format(temp_post3$dateTime, "%Y")
+temp_post3 <- subset(temp_post3, year != "2020")
 temp_post3$jdate <- yday(as.Date(temp_post3$dateTime))
 post3_day <- aggregate(X_00010_00000 ~ jdate, data = temp_post3, mean)
 
@@ -282,30 +318,38 @@ post_all <- Reduce(function(x, y) merge(x, y, by= "jdate"), df_list, accumulate=
 
 post_temp_site <- cbind(post_all, meantemp = rowMeans(post_all[2:4]))
 
-head(pre_temp_site)
-pre_date <- as.data.frame(month.day.year(pre_temp_site$jdate))
-pre_temp_site$monthday <- as.Date(with(pre_date, paste(month, day,sep="-")), "%m-%d")
-pre_temp_site$monthday <- as.Date(pre_temp_site$monthday)
+#head(pre_temp_site)
+#pre_date <- as.data.frame(month.day.year(pre_temp_site$jdate))
+#pre_temp_site$monthday <- as.Date(with(pre_date, paste(month, day,sep="-")), "%m-%d")
+#pre_temp_site$monthday <- as.Date(pre_temp_site$monthday)
 
 #then just output all of the plots
-jpeg(filename=paste("temp", gage.names[i], ".jpg"), width = 600, height = 600, units = "px", pointsize = 12,
+jpeg(filename=paste("Figures/", "temp.avg", gage.names[i], ".jpg"), 
+     width = 600, height = 600, units = "px", pointsize = 12,
      quality = 300)
 
 
 print(ggplot(pre_temp_site, aes(jdate, meantemp))+ 
-        geom_line(data=pre_temp_site, aes(jdate, meantemp, color="2008-10")) +
-        geom_line(data=post_temp_site, aes(jdate, meantemp, color="2017-19"))+
-        geom_line(data=pre_temp_site, aes(y=rollmean(meantemp, 20, na.pad=TRUE), color="2008-10"), size=1.5, na.rm = TRUE) +
-        geom_line(data=post_temp_site, aes(y=rollmean(meantemp, 20, na.pad=TRUE), color="2017-19"),size=1.5,na.rm = TRUE) +
+        #geom_line(data=pre_temp_site, aes(jdate, meantemp, color="2008-10")) +
+        #geom_line(data=post_temp_site, aes(jdate, meantemp, color="2017-19"))+
+        geom_line(data=pre_temp_site, aes(y=rollmean(meantemp, 20, na.pad=TRUE), 
+                                          color="2008-10"), size=1.5, na.rm = TRUE) +
+        geom_line(data=post_temp_site, aes(y=rollmean(meantemp, 20, na.pad=TRUE), 
+                                           color="2017-19"),size=1.5,na.rm = TRUE) +
         theme_bw() +
+        scale_color_manual(values=c("#999999", "#000000"))+
         theme(axis.line = element_line(color = "black"),
-              axis.text.y = element_text(color = "black"),
-              axis.text.x = element_text(color = "white"),
+              axis.text = element_text(size = 13),
+              axis.title.x = element_text(size = 13, face = "bold"),
+              axis.title.y = element_text(size = 13, face = "bold"),
               panel.grid.major = element_blank(),
               panel.grid.minor = element_blank(),
               panel.border = element_blank(),
               panel.background = element_blank())+
-        theme(legend.title=element_blank())+
+        ylab(expression(bold(Temperature~(degree~C))))+
+        xlab("Julian Date")+
+        theme(legend.title=element_blank(),
+              legend.text=element_text(size=13))+
         theme(legend.position = c(0.05, 0.95),legend.justification = c(0, 1)))
 
 dev.off()
