@@ -8,7 +8,7 @@ library(openxlsx)
 library(readxl)
 library(tidyverse)
 
-ichthy <- read_excel(("Data/HypotheticalIchthyograph.xlsx"), 
+ichthy <- read_excel(("FTL/Data/HypotheticalIchthyograph.xlsx"), 
                      sheet = "FTL")
 
 # x, y and z coordinates
@@ -16,13 +16,23 @@ x <- ichthy$Temperature
 y <- ichthy$Discharge
 z <- ichthy$Moonphase
 
+
 #Colorguide:
 # "#e3e309" = yellow, "#0982ba" = blue, "#1c0582" = purple
 
-plot3D::scatter3D(x, y, z, pch = 21, cex = 1.5,
-          col.var = as.integer(ichthy$LifePhase), 
-          col = c("#e3e309", "#0982ba", "#1c0582"),
+?scatter3D
+par("mar")
+#force viewing window - it was not plotting properly:
+par(mar=c(3,1,1,1))
+#plot
+scatter3D(x, y, z, pch = 16, cex = 1, theta = 45, #theta for rotating to best view
+          xlab = "Temperature",
+          ylab ="Discharge", 
+          zlab = "Moon Phase",
+          col.var = as.factor(ichthy$LifePhase), 
+          col = c("#e3e309", "#0982ba", "#AA4371"),
           ticktype = "detailed",
-          colkey = list(at = c(2, 3, 4), side = 1, 
-                        addlines = TRUE, length = 0.5, width = 0.5,
-                        labels = c("Smolt", "Fry", "Adult")) )
+          colkey = list(at = c(16.5, 50, 83.5), side = 1, #the range is 1:100 for sum unknown reason.
+              addlines = TRUE, length = 0.5, width = 0.5,
+              labels = c("Smolt", "Fry", "Adult")) )
+
